@@ -1,0 +1,67 @@
+﻿body {
+}
+
+.marked-mine {
+    background-image: url();
+}
+
+.mine {
+    background-image: url();
+}
+
+.blank {
+	backgroud-color: red;
+}
+
+.no-mine {
+	background-color: grey;
+}
+
+.one-mine {
+	background-image: url("data:image/svg+xml;utf8,\
+						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						  <text x='0' y='15' fill='blue' font-size='20'>1</text></svg>");
+}
+
+.two-mine {
+	background-image: url("data:image/svg+xml;utf8,\
+						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						  <text x='0' y='15' fill='green' font-size='10'>2</text></svg>");
+}
+
+.three-mine {
+	background-image: url("data:image/svg+xml;utf8,\
+						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						  <text x='0' y='15' fill='yellow' font-size='10'>3</text></svg>");
+}
+
+.four-mine {
+	background-image: url("data:image/svg+xml;utf8,\
+						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						  <text x='0' y='15' fill='red' font-size='10'>4</text></svg>");
+}
+
+.five-mine {
+	background-image: url("data:image/svg+xml;utf8,\
+						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						  <text x='0' y='15' fill='red' font-size='10'>5</text></svg>");
+}
+
+.six-mine {
+	background-image: url("data:image/svg+xml;utf8,\
+						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						  <text x='0' y='15' fill='red' font-size='10'>6</text></svg>");
+}
+
+.seven-mine {
+	background-image: url("data:image/svg+xml;utf8,\
+						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						  <text x='0' y='15' fill='red' font-size='10'>7</text></svg>");
+}
+
+.eight-mine {
+	background-image: url("data:image/svg+xml;utf8,\
+						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						  <text x='0' y='15' fill='red' font-size='10'>8</text></svg>");
+}
+}

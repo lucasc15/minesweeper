@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "name": "minesweepergame",
+  "private": true,
+  "dependencies": {
+    "angular": "1.6.2",
+    "jquery": "3.1.1"
+  }
+}

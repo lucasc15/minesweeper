@@ -1,0 +1,11 @@
+﻿<h1>Game Content</h1>
+<div ng-hide="showDifficulty">
+    <div ng-repeat="size in gameSizes">
+        <a ui-sref="game-config-difficulty(x:{{ size.x }}, y: {{ size.y }})">{{ size.name }}</a>
+    </div>
+</div>
+<div ng-hide="!showDifficulty">
+    <div ng-repeat="difficulty in gameDifficulties">
+        <a ui-sref="game(x: {{ x }}, y: {{ y }}, difficulty: {{ difficulty.difficulty }})">{{ difficulty.name }}</a>
+    </div>
+</div>

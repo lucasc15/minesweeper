@@ -1,0 +1,17 @@
+﻿<div class="game-container">
+    <div class="mine-counter">{{ gameData.mineDisplayCount }}</div>
+    <div class="time-counter">{{ gameData.timeCount }}</div>
+    <div ng-hide="gameData.gameFailed || gameData.isSolved">
+        <div class="game-row" ng-repeat="row in game">
+            <div ng-repeat="cell in row" ng-class="getClass($index, $index)" ng-click="makeMove($index, $index)"></div>
+        </div>
+    </div>
+    <div ng-hide="!gameData.gameFailed">
+        <p>You Lose!</p>
+        <a ui-sref="home">Try Again!</a>
+    </div>
+    <div ng-hide="!gameData.isSolved">
+        <p>you Win!</p>
+        <a ui-sref="home">Play Again!</a>
+    </div>
+</div>
