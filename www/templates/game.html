@@ -3,7 +3,7 @@
     <div class="time-counter">{{ gameData.timeCount }}</div>
     <div ng-hide="gameData.gameFailed || gameData.isSolved">
         <div class="game-row" ng-repeat="row in game">
-            <div ng-repeat="cell in row" ng-class="getClass($index, $index)" ng-click="makeMove($index, $index)"></div>
+            <div ng-repeat="cell in row" ng-class="getClass($index, parent.$index)" ng-click="makeMove($index, parent.$index)"></div>
         </div>
     </div>
     <div ng-hide="!gameData.gameFailed">
@@ -12,6 +12,6 @@
     </div>
     <div ng-hide="!gameData.isSolved">
         <p>you Win!</p>
-        <a ui-sref="home">Play Again!</a>
+        <a ui-sref="game-config-size">Play Again!</a>
     </div>
 </div>

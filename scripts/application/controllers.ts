@@ -2,7 +2,7 @@
     export class GameController {
         // Controller to store game state and create wrapper functions for the GameService interface
 
-        static $inject = ['gameService', 'MineDisplayService', "$interval", '$stateParams', '$scope'];
+        static $inject = ['$scope', '$stateParams', '$interval', 'gameService', 'MineDisplayService'];
         public $scope: ng.IScope;
         private $interval: ng.IIntervalService;
         private timeCounter: any;
@@ -10,8 +10,9 @@
         private gameService: IGameService;
         private mineDisplayService: IClassEnumService;
 
-        constructor($stateParams: ng.ui.IStateParamsService,
+        constructor(
             $scope: ng.IScope,
+            $stateParams: ng.ui.IStateParamsService,
             $interval: ng.IIntervalService,
             gameService: GameService,
             mineDisplayService: MineDisplayService
@@ -20,17 +21,19 @@
             // services/dependencies to register with the controller
             this.gameService = gameService;
             this.mineDisplayService = mineDisplayService;
-            this.$interval = $interval;
-            this.timeCounter = $interval(this.gameTimer, 1000)
+            // Initialize $scope binding
+            this.$scope = $scope;
             this.$scope.gameData = new GameData($stateParams.x, $stateParams.y, $stateParams.difficulty / 100);
             // Game state settings/loading
             this.loadGame(this.$scope.gameData.x, this.$scope.gameData.y, this.$scope.gameData.mineCount);
-            this.$scope.timeCount = 0;
+            // Start game timer
+            this.$interval = $interval;
+            this.timeCounter = $interval(this.gameTimer, 1000)
         }
 
         public loadGame(x: number, y: number, mineCount: number) {
             // Initalizes a game based on the size (x, y) and a difficulty (mine count)
-            this.gameService.loadGame(x, y, mineCount);
+            this.game = this.gameService.loadGame(x, y, mineCount);
         }
 
         public makeMove(x: number, y: number): void {
@@ -38,9 +41,8 @@
             if (!this.gameService.makeMove(x, y, this.game)) {
                 this.failedGame();
             }
-            if (this.gameService.isSolved(this.$scope.gameData.x, this.$scope.gameData.y, this.game)) {
-                this.$scope.gameData.isSolved = true;
-            }
+            this.$scope.gameData.isSolved = this.gameService.isSolved(
+                this.$scope.gameData.x, this.$scope.gameData.y, this.game);
         }
 
         public getClass(x: number, y: number): string {
@@ -77,25 +79,27 @@
 
         static $inject = ['$stateParams', '$scope'];
         public $scope: ng.IScope
-        public gameSizes: GameSize[];
-        public gameDifficulties: GameDifficulty[];
+        public gameSizes: Array<any>;
+        public gameDifficulties: Array<any>;
         public showDifficulties: boolean;
 
-        constructor($scope, $stateParams: ng.ui.IStateParamsService) {
-            this.$scope.x = $stateParams.x;
-            this.$scope.y = $stateParams.y;
-            this.$scope.showDifficulties = (this.$scope.x != undefined && this.$scope.y != undefined);
+        constructor($stateParams: ng.ui.IStateParamsService, $scope: ng.IScope) {
+            console.log("GameConfigController constructor:");
+            this.$scope = $scope;
+            this.$scope.x = ($stateParams.x != undefined) ? $stateParams.x : 0;
+            this.$scope.y = ($stateParams.y != undefined) ? $stateParams.y : 0;
+            this.$scope.showDifficulty = (this.$scope.x != 0 && this.$scope.y != 0);
 
             this.$scope.gameSizes = [
-                new GameSize(10, 10, "Small (10 x 10)"),
-                new GameSize(10, 20, "Medium (10 X 20)"),
-                new GameSize(10, 30, "Large (10 x 30)")
+                new GameSize(10, 10, 'Small (10 x 10)'),
+                new GameSize(10, 20, 'Medium (10 X 20'),
+                new GameSize(10, 30, 'Large (10 x 30)')
             ];
 
             this.$scope.gameDifficulties = [
-                new GameDifficulty(10, "Easy"),
-                new GameDifficulty(20, "Medium"),
-                new GameDifficulty(30, "Hard")
+                new GameDifficulty(10, 'Easy'),
+                new GameDifficulty(20, 'Medium'),
+                new GameDifficulty(30, 'Hard')
             ];
         }
     }

@@ -19,17 +19,18 @@ module MinesweeperApp {
         mineValue: number;
 
         /* Mine values:
-            -2:         Marked Mine
-            -1:         Mine
-            undefined:  Covered
+            -2:         Marked Mine: will display a black square with a 'flag' marker; need to figure out cursor ui
+            -1:         Mine: will remain covered until gameState = failed
+            undefined:  Covered/unknown by player
             1:          1 Mine
-            N:          N Mines
+            N:          N Mines, 1 <= N <= 8
         */
     }
 
     export class GameService implements IGameService {
         static $inject = ['$q'];
         mineValue = -1;
+        markedValue = -2;
 
         constructor(private $q: ng.IQService) {
         }
@@ -52,13 +53,14 @@ module MinesweeperApp {
 
         markMine(x: number, y: number, game: Array<Array<number>>): number {
             // Return number used to update the number of mines marked versus total mines
-            if (game[x][y] != -2 && game[x][y] === undefined) {
+            // return: amount to increment mineDisplayAmount
+            if (game[y][x] != -2 && game[y][x] === undefined) {
                 // Allow unselected squares to be marked only
-                game[x][y] = -2;
+                game[y][x] = this.markedValue;
                 return -1;
-            } else if (game[x][y] == -2) {
+            } else if (game[y][x] == -2) {
                 // case to unmark squares
-                game[x][y] = undefined;
+                game[y][x] = undefined;
                 return 1;
             } else {
                 return 0;
@@ -67,8 +69,8 @@ module MinesweeperApp {
 
         makeMove(x: number, y: number, game: Array<Array<number>>): boolean {
             // Move calculates if move is a mine (false == fail), else propagates choice until it hits non 0 value (0 mine around) places
-            if (game[x][y] < 0 || game[x][y] === undefined) {
-                if (game[x][y] == this.mineValue) {
+            if (game[y][x] < 0 || game[y][x] === undefined) {
+                if (game[y][x] == this.mineValue) {
                     return false;
                 } else {
                     this.searchMove(x, y, game);
@@ -82,22 +84,22 @@ module MinesweeperApp {
             var mines: number;
             for (var i = y - 1; i <= y + 1; i++) {
                 for (var j = x - 1; j <= x + 1; j++) {
-                    mines = this.mineCount(i, j, game);
-                    if (mines == 0 && game[i][j] === undefined) {
-                        this.searchMove(i, j, game);
+                    mines = this.countMines(i, j, game);
+                    if (mines == 0 && game[j][i] === undefined) {
+                        this.searchMove(j, i, game);
                     }
-                    game[i][j] = mines;
+                    game[j][i] = mines;
                 }
             }
         }
 
-        private mineCount(x: number, y: number, game: Array<Array<number>>): number {
+        private countMines(x: number, y: number, game: Array<Array<number>>): number {
             // Helper function to count the number of mines around a point (a total of 8 bordering squares)
             for (var i = y - 1; i <= y + 1; i++) {
                 var bombCount = 0;
                 for (var j = x - 1; j <= x + 1; j++) {
                     if ((j >= 0 && j < x) && (i >= 0 && i < y)) {
-                        if (game[i][j] == this.mineValue) {
+                        if (game[j][i] == this.mineValue) {
                             bombCount++;
                         }
                     } 
@@ -108,14 +110,24 @@ module MinesweeperApp {
 
         public isSolved(x: number, y: number, game: Array<Array<number>>) {
             // Checks to see if the current game is solved
-            for (var i = 0; i < x; i++) {
-                for (var j = 0; j < y; j++) {
-                    if (game[i][j] === undefined) {
+            for (var i = 0; i < y; i++) {
+                for (var j = 0; j < x; j++) {
+                    if (game[j][i] === undefined) {
                         return false;
                     }
                 }
             }
             return true;
+        }
+
+        public solveGame(x: number, y: number, game: Array<Array<number>>): void {
+            for (var i = 0; i < y; i++) {
+                for (var j = 0; j < x; j++) {
+                    if (game[j][i] === undefined) {
+                        game[j][i] = this.countMines(j, i, game)
+                    }
+                }
+            }
         }
 
         private randomIntFromInterval(min: number, max: number) {
@@ -128,40 +140,62 @@ module MinesweeperApp {
     export interface IClassEnumService {
         // Interface to determine the display of a square based on its mine value. Display is defined in game.css
         getClass(value: number, failedGame: boolean): string;
+        baseClass: string;
     }
 
     export class MineDisplayService {
-        // Helper function to determine current state of a tile and return the class value for the square
+
+        baseClass: string;
+
+        constructor() {
+            this.baseClass = "square";
+        }
+
         getClass(value: number, failedGame: boolean): string {
+            // Helper function to determine current state of a tile and return the class value for the square
+            var displayClass: string;
             switch (value) {
                 case -2:
-                    return "marked-mine";
+                    displayClass = "marked-mine";
+                    break;
                 case -1:
                     if (failedGame) {
-                        return "mine";
+                        displayClass = "mine";
+                    } else {
+                        displayClass = "blank";
                     }
-                    return "blank";
+                    break;
                 case 0:
-                    return "no-mine"
+                    displayClass = "no-mine";
+                    break;
                 case 1:
-                    return "one-mine";
+                    displayClass = "one-mine";
+                    break;
                 case 2:
-                    return "two-mine";
+                    displayClass = "two-mine";
+                    break;
                 case 3:
-                    return "three-mine";
+                    displayClass = "three-mine";
+                    break;
                 case 4:
-                    return "four-mine";
+                    displayClass = "four-mine";
+                    break;
                 case 5:
-                    return "five-mine";
+                    displayClass = "five-mine";
+                    break;
                 case 6:
-                    return "six-mine";
+                    displayClass = "six-mine";
+                    break;
                 case 7:
-                    return "seven-mine";
+                    displayClass = "seven-mine";
+                    break;
                 case 8:
-                    return "eight-mine"
+                    displayClass = "eight-mine"
+                    break;
                 default:
-                    return "blank"
+                    displayClass = "blank"
             }
+            return this.baseClass + ' ' + displayClass;
         }
     }
 }

@@ -15,22 +15,22 @@ module MinesweeperApp {
                 templateUrl: "templates/home.html",
                 controller: HomeController
             })
-            .state('game-config', {
+            .state('game-config-size', {
                 url: '/game-config',
                 templateUrl: "templates/game-config.html",
                 controller: GameConfigController
             })
-            .state('game-config-diff', {
+            .state('game-config-difficulty', {
                 url: '/game-config/:x/:y',
                 templateUrl: "templates/game-config.html",
                 controller: GameConfigController,
-                params: {x: 10, y: 10}
+                // params: {x: 10, y: 10}
             })
             .state('game', {
                 url: '/game/:x/:y/:difficulty',
                 templateUrl: "templates/game.html",
                 controller: GameController,
-                params: {x: 10, y: 10, difficulty: 10}
+                // params: {x: 10, y: 10, difficulty: 10}
             })
             .state('score', {
                 url: '/scores',
