@@ -5,7 +5,7 @@
     "angular-route": "1.6.2",
     "firebase": "3.6.10",
     "jQuery": "3.1.1",
-    "ionic": "2.1.0",
+    "bootstrap-css": "3.3.6",
     "cordova": "3.4.0"
   }
 }

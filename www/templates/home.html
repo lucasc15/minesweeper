@@ -1,5 +1,10 @@
-﻿<div>
-    <h1>Home!</h1>
-    <a ui-sref="game-config-size">{{ startGameMessage }}</a>
-    <a ui-sref="score">{{ scoresMessage }}</a>
+﻿
+<div class="bar bar-header bar-balanced">
+    <h1 class="title">{{ title }}</h1>
+</div>
+<div>
+    <div class="option-selection-wrapper">
+        <a ui-sref="game-config-size" class="button button-block button-positive">{{ startGameMessage }}</a>
+        <a ui-sref="score" class="button button-block button-positive">{{ scoresMessage }}</a>
+    </div>
 </div>

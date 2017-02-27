@@ -1,11 +1,15 @@
-﻿<h1>Game Content</h1>
-<div ng-hide="showDifficulty">
-    <div ng-repeat="size in gameSizes">
-        <a ui-sref="game-config-difficulty({x: size.x, y: size.y})">{{ size.name }}</a>
-    </div>
+﻿<div class="bar bar-header bar-balanced">
+    <h1 class="title">{{ title }}</h1>
 </div>
-<div ng-hide="!showDifficulty">
-    <div ng-repeat="diff in gameDifficulties">
-        <a ui-sref="game({x: x, y: y, difficulty: diff.difficulty})">{{ diff.name }}</a>
+<div class="option-selection-wrapper">
+    <div ng-hide="showDifficulty">
+        <div ng-repeat="size in gameSizes">
+            <a ui-sref="game-config-difficulty({x: size.x, y: size.y})" class="button button-block button-positive">{{ size.name }}</a>
+        </div>
+    </div>
+    <div ng-hide="!showDifficulty">
+        <div ng-repeat="diff in gameDifficulties">
+            <a ui-sref="game({x: x, y: y, difficulty: diff.difficulty})" class="button button-block button-positive">{{ diff.name }}</a>
+        </div>
     </div>
 </div>

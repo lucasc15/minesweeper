@@ -2,7 +2,7 @@
     export class GameController {
         // Controller to store game state and create wrapper functions for the GameService interface
 
-        static $inject = ['$scope', '$stateParams', '$interval', 'gameService', 'MineDisplayService'];
+        static $inject = ['$scope', '$stateParams', '$interval', 'gameService', 'mineDisplayService'];
         public $scope: ng.IScope;
         private $interval: ng.IIntervalService;
         private timeCounter: any;
@@ -17,18 +17,24 @@
             gameService: GameService,
             mineDisplayService: MineDisplayService
         ) {
+            console.log("Game constructor");
             // Use URL angular route to accept these values to start a new game
             // services/dependencies to register with the controller
             this.gameService = gameService;
             this.mineDisplayService = mineDisplayService;
+            console.log("Registered services")
             // Initialize $scope binding
             this.$scope = $scope;
             this.$scope.gameData = new GameData($stateParams.x, $stateParams.y, $stateParams.difficulty / 100);
+            console.log('initialized scope data');
             // Game state settings/loading
             this.loadGame(this.$scope.gameData.x, this.$scope.gameData.y, this.$scope.gameData.mineCount);
             // Start game timer
+            console.log('loaded game');
             this.$interval = $interval;
+            console.log("got here!");
             this.timeCounter = $interval(this.gameTimer, 1000)
+            console.log("end of constructor");
         }
 
         public loadGame(x: number, y: number, mineCount: number) {
@@ -79,20 +85,21 @@
 
         static $inject = ['$stateParams', '$scope'];
         public $scope: ng.IScope
-        public gameSizes: Array<any>;
-        public gameDifficulties: Array<any>;
+        private gameSizes: Array<any>;
+        private gameDifficulties: Array<any>;
         public showDifficulties: boolean;
 
         constructor($stateParams: ng.ui.IStateParamsService, $scope: ng.IScope) {
-            console.log("GameConfigController constructor:");
             this.$scope = $scope;
             this.$scope.x = ($stateParams.x != undefined) ? $stateParams.x : 0;
             this.$scope.y = ($stateParams.y != undefined) ? $stateParams.y : 0;
             this.$scope.showDifficulty = (this.$scope.x != 0 && this.$scope.y != 0);
+            this.$scope.title = (this.$scope.showDifficulty) ?
+                'Game Setup - Difficulty' : 'Game Setup - Size';
 
             this.$scope.gameSizes = [
                 new GameSize(10, 10, 'Small (10 x 10)'),
-                new GameSize(10, 20, 'Medium (10 X 20'),
+                new GameSize(10, 20, 'Medium (10 X 20)'),
                 new GameSize(10, 30, 'Large (10 x 30)')
             ];
 
@@ -137,6 +144,7 @@
 
         constructor($scope: ng.IScope) {
             this.$scope = $scope;
+            this.$scope.title = 'Home';
             this.$scope.startGameMessage = "New Game";
             this.$scope.scoresMessage = "My High Scores";
         }

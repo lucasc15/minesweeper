@@ -75,42 +75,47 @@ var MinesweeperApp;
     };
     routeConfig.$inject = ['$stateProvider'];
     angular.module('minesweeperApp', ['ui.router', 'ngRoute'])
+        .service('gameService', MinesweeperApp.GameService)
+        .service('mineDisplayService', MinesweeperApp.MineDisplayService)
         .controller('homeController', MinesweeperApp.HomeController)
         .controller('gameConfigController', MinesweeperApp.GameConfigController)
         .controller('gameController', MinesweeperApp.GameController)
         .controller('scoreController', MinesweeperApp.ScoreController)
-        .service('gameService', MinesweeperApp.GameService)
         .config(routeConfig);
 })(MinesweeperApp || (MinesweeperApp = {}));
 var MinesweeperApp;
 (function (MinesweeperApp) {
     var GameController = (function () {
-        function GameController($stateParams, $scope, $interval, gameService, mineDisplayService) {
+        function GameController($scope, $stateParams, $interval, gameService, mineDisplayService) {
+            console.log("Game constructor");
             // Use URL angular route to accept these values to start a new game
             // services/dependencies to register with the controller
             this.gameService = gameService;
             this.mineDisplayService = mineDisplayService;
+            console.log("Registered services");
             // Initialize $scope binding
             this.$scope = $scope;
             this.$scope.gameData = new GameData($stateParams.x, $stateParams.y, $stateParams.difficulty / 100);
+            console.log('initialized scope data');
             // Game state settings/loading
             this.loadGame(this.$scope.gameData.x, this.$scope.gameData.y, this.$scope.gameData.mineCount);
             // Start game timer
+            console.log('loaded game');
             this.$interval = $interval;
+            console.log("got here!");
             this.timeCounter = $interval(this.gameTimer, 1000);
+            console.log("end of constructor");
         }
         GameController.prototype.loadGame = function (x, y, mineCount) {
             // Initalizes a game based on the size (x, y) and a difficulty (mine count)
-            this.gameService.loadGame(x, y, mineCount);
+            this.game = this.gameService.loadGame(x, y, mineCount);
         };
         GameController.prototype.makeMove = function (x, y) {
             // Makes a move and changes game state through game service, then checks if it is solved
             if (!this.gameService.makeMove(x, y, this.game)) {
                 this.failedGame();
             }
-            if (this.gameService.isSolved(this.$scope.gameData.x, this.$scope.gameData.y, this.game)) {
-                this.$scope.gameData.isSolved = true;
-            }
+            this.$scope.gameData.isSolved = this.gameService.isSolved(this.$scope.gameData.x, this.$scope.gameData.y, this.game);
         };
         GameController.prototype.getClass = function (x, y) {
             // Wrapper to determine the style (class) of a square based on its state/mine value
@@ -137,18 +142,19 @@ var MinesweeperApp;
         return GameController;
     }());
     // Controller to store game state and create wrapper functions for the GameService interface
-    GameController.$inject = ['gameService', 'MineDisplayService', "$interval", '$stateParams', '$scope'];
+    GameController.$inject = ['$scope', '$stateParams', '$interval', 'gameService', 'mineDisplayService'];
     MinesweeperApp.GameController = GameController;
     var GameConfigController = (function () {
         function GameConfigController($stateParams, $scope) {
-            console.log("GameConfigController constructor:");
             this.$scope = $scope;
             this.$scope.x = ($stateParams.x != undefined) ? $stateParams.x : 0;
             this.$scope.y = ($stateParams.y != undefined) ? $stateParams.y : 0;
             this.$scope.showDifficulty = (this.$scope.x != 0 && this.$scope.y != 0);
+            this.$scope.title = (this.$scope.showDifficulty) ?
+                'Game Setup - Difficulty' : 'Game Setup - Size';
             this.$scope.gameSizes = [
                 new GameSize(10, 10, 'Small (10 x 10)'),
-                new GameSize(10, 20, 'Medium (10 X 20'),
+                new GameSize(10, 20, 'Medium (10 X 20)'),
                 new GameSize(10, 30, 'Large (10 x 30)')
             ];
             this.$scope.gameDifficulties = [
@@ -181,6 +187,7 @@ var MinesweeperApp;
     var HomeController = (function () {
         function HomeController($scope) {
             this.$scope = $scope;
+            this.$scope.title = 'Home';
             this.$scope.startGameMessage = "New Game";
             this.$scope.scoresMessage = "My High Scores";
         }
@@ -214,6 +221,7 @@ var MinesweeperApp;
     var GameService = (function () {
         function GameService($q) {
             this.$q = $q;
+            console.log("Game service init!!");
             this.mineValue = -1;
             this.markedValue = -2;
         }
@@ -317,8 +325,10 @@ var MinesweeperApp;
     }());
     GameService.$inject = ['$q'];
     MinesweeperApp.GameService = GameService;
+    angular.module('minesweeperApp').service('gameService', GameService);
     var MineDisplayService = (function () {
-        function MineDisplayService() {
+        function MineDisplayService($q) {
+            this.$q = $q;
             this.baseClass = "square";
         }
         MineDisplayService.prototype.getClass = function (value, failedGame) {
@@ -370,6 +380,8 @@ var MinesweeperApp;
         };
         return MineDisplayService;
     }());
+    MineDisplayService.$inject = ['$q'];
     MinesweeperApp.MineDisplayService = MineDisplayService;
+    angular.module('minesweeperApp').service('mineDisplayService', MineDisplayService);
 })(MinesweeperApp || (MinesweeperApp = {}));
 //# sourceMappingURL=appBundle.js.map

@@ -41,10 +41,11 @@ module MinesweeperApp {
     routeConfig.$inject = ['$stateProvider']
 
     angular.module('minesweeperApp', ['ui.router', 'ngRoute'])
+        .service('gameService', GameService)
+        .service('mineDisplayService', MineDisplayService)
         .controller('homeController', HomeController)
         .controller('gameConfigController', GameConfigController)
         .controller('gameController', GameController)
         .controller('scoreController', ScoreController)
-        .service('gameService', GameService)
         .config(routeConfig);
 }

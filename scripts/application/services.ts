@@ -29,10 +29,13 @@ module MinesweeperApp {
 
     export class GameService implements IGameService {
         static $inject = ['$q'];
-        mineValue = -1;
-        markedValue = -2;
+        public mineValue: number;
+        public markedValue: number;
 
         constructor(private $q: ng.IQService) {
+            console.log("Game service init!!");
+            this.mineValue = -1;
+            this.markedValue = -2;
         }
 
         loadGame(x: number, y: number, mineCount: number): Array<Array<number>> {
@@ -65,7 +68,7 @@ module MinesweeperApp {
             } else {
                 return 0;
             }
-        } 
+        }
 
         makeMove(x: number, y: number, game: Array<Array<number>>): boolean {
             // Move calculates if move is a mine (false == fail), else propagates choice until it hits non 0 value (0 mine around) places
@@ -102,7 +105,7 @@ module MinesweeperApp {
                         if (game[j][i] == this.mineValue) {
                             bombCount++;
                         }
-                    } 
+                    }
                 }
             }
             return bombCount;
@@ -137,17 +140,21 @@ module MinesweeperApp {
         }
     }
 
+    angular.module('minesweeperApp').service('gameService', GameService);
+    
+
     export interface IClassEnumService {
         // Interface to determine the display of a square based on its mine value. Display is defined in game.css
         getClass(value: number, failedGame: boolean): string;
         baseClass: string;
     }
 
-    export class MineDisplayService {
+    export class MineDisplayService implements IClassEnumService {
 
+        static $inject = ['$q'];
         baseClass: string;
 
-        constructor() {
+        constructor(private $q: ng.IQService) {
             this.baseClass = "square";
         }
 
@@ -198,4 +205,5 @@ module MinesweeperApp {
             return this.baseClass + ' ' + displayClass;
         }
     }
+    angular.module('minesweeperApp').service('mineDisplayService', MineDisplayService);
 }

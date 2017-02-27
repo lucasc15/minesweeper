@@ -95,3 +95,15 @@ h1 {
     animation:fade 3000ms infinite;
     -webkit-animation:fade 3000ms infinite;
 }
+
+.option-selection-wrapper {
+    width: 80%;
+    overflow: auto hidden;
+    margin: 20% auto;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.option-selection-wrapper a {
+    margin-top: 10% !important;
+}
