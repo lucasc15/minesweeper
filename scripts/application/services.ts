@@ -4,10 +4,13 @@ module MinesweeperApp {
     export interface IGameService {
         // Interface handles implementation of game logic, which the controller creates wrappers around
         // The service is also stateless, the controller passes a game state and remembers the game state.
-
         // Modifies reference of game board, and recursively searches a move to propagate areas with no bombs
         // Searching also calculates the number of bombs near uncovered areas.
-        loadGame(x: number, y: number, difficulty: number): Array<Array<number>>;
+
+        // Constructor Params for game size
+        loadGame(mineCount: number): Array<Array<number>>;
+        // Set game size for individual instance of the game service
+        setGameSize(x: number, y: number): void;
         // Move is a wrapper that firswt decides if they lost, and if not, propagates a 
         // choice out show all continuous squares with no bombs
         makeMove(x: number, y: number, game: Array<Array<number>>): boolean;
@@ -15,6 +18,8 @@ module MinesweeperApp {
         markMine(x: number, y: number, game: Array<Array<number>>): number;
         // Function to check if the game is solved
         isSolved(x: number, y: number, game: Array<Array<number>>): boolean;
+        // Function to restart the game
+        resetGame(game: Array<Array<number>>): void;
         // This is the service value that represents a bomb, selected to be -1;
         mineValue: number;
 
@@ -31,19 +36,21 @@ module MinesweeperApp {
         static $inject = ['$q'];
         public mineValue: number;
         public markedValue: number;
+        private sizeX: number;
+        private sizeY: number;
 
         constructor(private $q: ng.IQService) {
             this.mineValue = -1;
             this.markedValue = -2;
         }
 
-        loadGame(x: number, y: number, mineCount: number): Array<Array<number>> {
-            var game = this.createEmptyArray(x, y);
+        loadGame(mineCount: number): Array<Array<number>> {
+            var game = this.createEmptyArray(this.sizeX, this.sizeY);
             var randX: number, randY: number;
             // Randomly pick indices
             while (mineCount > 0) {
-                randX = this.randomIntFromInterval(0, x - 1);
-                randY = this.randomIntFromInterval(0, y - 1);
+                randX = this.randomIntFromInterval(0, this.sizeX - 1);
+                randY = this.randomIntFromInterval(0, this.sizeY - 1);
                 if (game[randY][randX] === undefined) {
                     game[randY][randX] = -1;
                     mineCount--;
@@ -73,34 +80,51 @@ module MinesweeperApp {
             if (game[y][x] < 0 || game[y][x] === undefined) {
                 if (game[y][x] == this.mineValue) {
                     return false;
-                } else {
-                    this.searchMove(x, y, game);
-                    return true;
                 }
+                var mineCount = this.countMines(x, y, game);
+                game[y][x] = mineCount;
+                console.log(game[y][x]);
+                console.log(game[y][x] == 0);
+                if (game[y][x] == 0) {
+                    console.log("search!");
+                    var searched = this.createEmptyBooleanArray(this.sizeX, this.sizeY);
+                    this.searchMove(x, y, game, searched);
+                }
+                console.log('inside makeMove');
+                console.log("x: " + x);
+                console.log("y: " + y);
+                console.log(game[y][x]);
+                return true;
             }
+            console.log('outside makeMove');
+            console.log(game[y][x]);
+            return true;
         }
 
-        searchMove(x: number, y: number, game: Array<Array<number>>): void {
+        searchMove(x: number, y: number, game: Array<Array<number>>, searched: Array<Array<boolean>>): void {
             // Recursive helper to continue searching adjacent squares until it reaches one that is bordering a mine, at which point recursive calls stop
             var mines: number;
             for (var i = y - 1; i <= y + 1; i++) {
                 for (var j = x - 1; j <= x + 1; j++) {
-                    mines = this.countMines(i, j, game);
-                    if (mines == 0 && game[j][i] === undefined) {
-                        this.searchMove(j, i, game);
+                    if ((i >= 0 && i < this.sizeY) && (j >= 0 && j < this.sizeX) && !searched[i][j] && game[i][j] != this.mineValue) {
+                        mines = this.countMines(j, i, game);
+                        searched[i][j] = true;
+                        game[i][j] = mines;
+                        if (mines == 0) {
+                            this.searchMove(j, i, game, searched);
+                        }
                     }
-                    game[j][i] = mines;
                 }
             }
         }
 
         private countMines(x: number, y: number, game: Array<Array<number>>): number {
             // Helper function to count the number of mines around a point (a total of 8 bordering squares)
+            var bombCount = 0;
             for (var i = y - 1; i <= y + 1; i++) {
-                var bombCount = 0;
                 for (var j = x - 1; j <= x + 1; j++) {
-                    if ((j >= 0 && j < x) && (i >= 0 && i < y)) {
-                        if (game[j][i] == this.mineValue) {
+                    if ((j >= 0 && j < this.sizeX) && (i >= 0 && i < this.sizeY)) {
+                        if (game[i][j] == this.mineValue) {
                             bombCount++;
                         }
                     }
@@ -111,9 +135,9 @@ module MinesweeperApp {
 
         public isSolved(x: number, y: number, game: Array<Array<number>>) {
             // Checks to see if the current game is solved
-            for (var i = 0; i < y; i++) {
-                for (var j = 0; j < x; j++) {
-                    if (game[j][i] === undefined) {
+            for (var i = 0; i < this.sizeY; i++) {
+                for (var j = 0; j < this.sizeX; j++) {
+                    if (game[i][j] === undefined) {
                         return false;
                     }
                 }
@@ -124,8 +148,8 @@ module MinesweeperApp {
         public solveGame(x: number, y: number, game: Array<Array<number>>): void {
             for (var i = 0; i < y; i++) {
                 for (var j = 0; j < x; j++) {
-                    if (game[j][i] === undefined) {
-                        game[j][i] = this.countMines(j, i, game)
+                    if (game[i][j] === undefined) {
+                        game[i][j] = this.countMines(j, i, game)
                     }
                 }
             }
@@ -147,6 +171,33 @@ module MinesweeperApp {
                 game.push(tmp);
             }
             return game;
+        }
+
+        private createEmptyBooleanArray(x: number, y: number): Array<Array<boolean>> {
+            var arr = new Array();
+            for (var i = 0; i < y; i++) {
+                var tmp = new Array();
+                for (var j = 0; j < x; j++) {
+                    tmp.push(false);
+                }
+                arr.push(tmp);
+            }
+            return arr;
+        }
+
+        public setGameSize(x: number, y: number): void {
+            this.sizeX = x;
+            this.sizeY = y;
+        }
+
+        public resetGame(game: Array<Array<number>>): void {
+            for (var i = 0; i < this.sizeY; i++) {
+                for (var j = 0; j < this.sizeX; j++) {
+                    if (game[i][j] != this.mineValue) {
+                        game[i][j] == undefined;
+                    }
+                }
+            }
         }
     }
 
@@ -173,11 +224,12 @@ module MinesweeperApp {
                     displayClass = "marked-mine";
                     break;
                 case -1:
-                    if (failedGame) {
+                    /*if (failedGame) {
                         displayClass = "mine";
                     } else {
                         displayClass = "blank";
-                    }
+                    }*/
+                    displayClass = "mine";
                     break;
                 case 0:
                     displayClass = "no-mine";

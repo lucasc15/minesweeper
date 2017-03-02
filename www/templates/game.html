@@ -3,8 +3,8 @@
 <div class="game-container">
     <div ng-hide="vm.gameData.gameFailed || vm.gameData.isSolved">
         <div class="game-row" ng-repeat="row in vm.game track by $index">
-            <div ng-repeat="cell in row track by $index" ng-class="vm.getClass($index, parent.$index)" class="base" ng-click="vm.makeMove($index, parent.$index)">
-                &nbsp;
+            <div ng-repeat="cell in row track by $index" ng-class="vm.getClass($index, $parent.$index)" class="base" ng-click="vm.makeMove($index, $parent.$index)">
+                &nbsp; <!-- placeholder to give div a size -->
             </div>
         </div>
     </div>

@@ -25,16 +25,17 @@
             this.mineDisplayService = mineDisplayService;
             // Setup Game
             this.gameData = new GameData($stateParams.x, $stateParams.y, $stateParams.difficulty);
-            this.loadGame(this.gameData.x, this.gameData.y, this.gameData.difficulty);
+            this.gameService.setGameSize(this.gameData.x, this.gameData.y);
+            this.loadGame(this.gameData.mineCount);
             // Start game timer
             this.$interval = $interval;
-            this.timeCounter = this.$interval(() => this.gameTimer(), 1000);
+            this.startTimer();
+            console.log(this.game);
         }
 
-        private loadGame(x: number, y: number, mineCount: number) {
+        private loadGame(mineCount: number) {
             // Initalizes a game based on the size (x, y) and a difficulty (mine count)
-            // this.$scope.game = this.gameService.loadGame(x, y, mineCount);
-            this.game = this.gameService.loadGame(x, y, mineCount)
+            this.game = this.gameService.loadGame(mineCount);
         }
 
         public makeMove(x: number, y: number): void {
@@ -46,10 +47,10 @@
                 this.gameData.x, this.gameData.y, this.game);
         }
 
-        // use like <tag ng-class="getClass(x, y)"/>
+        // use like <tag ng-class="getClass(x, y)"/> where x/y is column/row
         public getClass(x: number, y: number): string {
             // Wrapper to determine the style (class) of a square based on its state/mine value
-            return this.mineDisplayService.getClass(this.game[x][y], this.gameData.gameFailed);
+            return this.mineDisplayService.getClass(this.game[y][x], this.gameData.gameFailed);
         }
 
         public markMine(x: number, y: number): void {
@@ -66,9 +67,21 @@
         // private gameTimer($scope: ng.IScope): void {
         private gameTimer(): void {
             // Function to be run in a setInterval to track time passed since game start
-            // $scope.gameData.timeCount++;
             this.gameData.timeCount++;
         }
+
+        private startTime(): void {
+            this.timeCounter = this.$interval(() => this.gameTimer(), 1000);
+        }
+
+        private restartGame(): void {
+            this.gameService.resetGame(this.game);
+            this.gameData.timeCount = 0;
+            this.startTime();
+            this.gameData.gameFailed = false;
+            this.gameData.isSolved = false;
+        }
+        
     }
 
     export class GameConfigController {
@@ -157,7 +170,7 @@
             this.x = x;
             this.y = y;
             this.difficulty = difficulty;
-            this.mineCount = Math.floor(this.difficulty * this.x * this.y);
+            this.mineCount = Math.floor(this.x * this.y * this.difficulty / 100);
             this.isSolved = false;
             this.gameFailed = false;
             this.timeCount = 0;

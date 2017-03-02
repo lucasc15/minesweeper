@@ -92,63 +92,48 @@ var MinesweeperApp;
 (function (MinesweeperApp) {
     class GameController {
         constructor($scope, $stateParams, $interval, gameService, mineDisplayService) {
-            // Use URL angular route to accept these values to start a new game
-            // services/dependencies to register with the controller
+            // Bind scope to controller fields
             $scope.vm = this;
+            // Setup services
             this.gameService = gameService;
             this.mineDisplayService = mineDisplayService;
-            console.log("mine display service: ");
-            console.log(this.mineDisplayService);
-            // Initialize $scope binding
-            //this.$scope = $scope;
+            // Setup Game
             this.gameData = new GameData($stateParams.x, $stateParams.y, $stateParams.difficulty);
-            //this.$scope.gameData = new GameData($stateParams.x, $stateParams.y, $stateParams.difficulty / 100);
-            //this.$scope.getClass = this.getClass;
-            //this.$scope.makeMove = this.makeMove;
-            //this.$scope.markMine = this.markMine;
-            // console.log(this.$scope.gameData);
-            // Game state settings/loading
-            // this.loadGame(this.$scope.gameData.x, this.$scope.gameData.y, this.$scope.gameData.mineCount);
-            this.loadGame(this.gameData.x, this.gameData.y, this.gameData.difficulty);
+            this.gameService.setGameSize(this.gameData.x, this.gameData.y);
+            this.loadGame(this.gameData.mineCount);
             // Start game timer
             this.$interval = $interval;
-            // this.timeCounter = this.$interval(() => this.gameTimer(this.$scope), 1000)
             this.timeCounter = this.$interval(() => this.gameTimer(), 1000);
+            console.log(this.game);
         }
-        loadGame(x, y, mineCount) {
+        loadGame(mineCount) {
             // Initalizes a game based on the size (x, y) and a difficulty (mine count)
-            // this.$scope.game = this.gameService.loadGame(x, y, mineCount);
-            this.game = this.gameService.loadGame(x, y, mineCount);
+            this.game = this.gameService.loadGame(mineCount);
         }
         makeMove(x, y) {
             // Makes a move and changes game state through game service, then checks if it is solved
-            console.log("Make move ran!");
-            if (!this.gameService.makeMove(x, y, this.$scope.game)) {
+            if (!this.gameService.makeMove(x, y, this.game)) {
                 this.failedGame();
             }
-            this.$scope.gameData.isSolved = this.gameService.isSolved(this.$scope.gameData.x, this.$scope.gameData.y, this.$scope.game);
+            this.gameData.isSolved = this.gameService.isSolved(this.gameData.x, this.gameData.y, this.game);
         }
-        // use like <tag ng-class="getClass(x, y)"/>
+        // use like <tag ng-class="getClass(x, y)"/> where x/y is column/row
         getClass(x, y) {
             // Wrapper to determine the style (class) of a square based on its state/mine value
-            console.log('getClass run!');
-            console.log(this.mineDisplayService);
-            console.log(this.gameService);
-            return this.mineDisplayService.getClass(this.$scope.game[x][y], this.$scope.gameData.gameFailed);
+            return this.mineDisplayService.getClass(this.game[y][x], this.gameData.gameFailed);
         }
         markMine(x, y) {
             // Player marks a square as a mine. Not activated as how does right clicking work on the app?
-            this.$scope.gameData.mineDisplayCount += this.gameService.markMine(x, y, this.$scope.game);
+            this.gameData.mineDisplayCount += this.gameService.markMine(x, y, this.game);
         }
         failedGame() {
             // Changed game state to failed, notifies view
             this.$interval.cancel(this.timeCounter);
-            this.$scope.gameData.gameFailed = true;
+            this.gameData.gameFailed = true;
         }
         // private gameTimer($scope: ng.IScope): void {
         gameTimer() {
             // Function to be run in a setInterval to track time passed since game start
-            // $scope.gameData.timeCount++;
             this.gameData.timeCount++;
         }
     }
@@ -208,7 +193,7 @@ var MinesweeperApp;
             this.x = x;
             this.y = y;
             this.difficulty = difficulty;
-            this.mineCount = Math.floor(this.difficulty * this.x * this.y);
+            this.mineCount = Math.floor(this.x * this.y * this.difficulty / 100);
             this.isSolved = false;
             this.gameFailed = false;
             this.timeCount = 0;
@@ -227,13 +212,13 @@ var MinesweeperApp;
             this.mineValue = -1;
             this.markedValue = -2;
         }
-        loadGame(x, y, mineCount) {
-            var game = this.createEmptyArray(x, y);
+        loadGame(mineCount) {
+            var game = this.createEmptyArray(this.sizeX, this.sizeY);
             var randX, randY;
             // Randomly pick indices
             while (mineCount > 0) {
-                randX = this.randomIntFromInterval(0, x - 1);
-                randY = this.randomIntFromInterval(0, y - 1);
+                randX = this.randomIntFromInterval(0, this.sizeX - 1);
+                randY = this.randomIntFromInterval(0, this.sizeY - 1);
                 if (game[randY][randX] === undefined) {
                     game[randY][randX] = -1;
                     mineCount--;
@@ -264,32 +249,48 @@ var MinesweeperApp;
                 if (game[y][x] == this.mineValue) {
                     return false;
                 }
-                else {
-                    this.searchMove(x, y, game);
-                    return true;
+                var mineCount = this.countMines(x, y, game);
+                game[y][x] = mineCount;
+                console.log(game[y][x]);
+                console.log(game[y][x] == 0);
+                if (game[y][x] == 0) {
+                    console.log("search!");
+                    var searched = this.createEmptyBooleanArray(this.sizeX, this.sizeY);
+                    this.searchMove(x, y, game, searched);
                 }
+                console.log('inside makeMove');
+                console.log("x: " + x);
+                console.log("y: " + y);
+                console.log(game[y][x]);
+                return true;
             }
+            console.log('outside makeMove');
+            console.log(game[y][x]);
+            return true;
         }
-        searchMove(x, y, game) {
+        searchMove(x, y, game, searched) {
             // Recursive helper to continue searching adjacent squares until it reaches one that is bordering a mine, at which point recursive calls stop
             var mines;
             for (var i = y - 1; i <= y + 1; i++) {
                 for (var j = x - 1; j <= x + 1; j++) {
-                    mines = this.countMines(i, j, game);
-                    if (mines == 0 && game[j][i] === undefined) {
-                        this.searchMove(j, i, game);
+                    if ((i >= 0 && i < this.sizeY) && (j >= 0 && j < this.sizeX) && !searched[i][j] && game[i][j] != this.mineValue) {
+                        mines = this.countMines(j, i, game);
+                        searched[i][j] = true;
+                        game[i][j] = mines;
+                        if (mines == 0) {
+                            this.searchMove(j, i, game, searched);
+                        }
                     }
-                    game[j][i] = mines;
                 }
             }
         }
         countMines(x, y, game) {
             // Helper function to count the number of mines around a point (a total of 8 bordering squares)
+            var bombCount = 0;
             for (var i = y - 1; i <= y + 1; i++) {
-                var bombCount = 0;
                 for (var j = x - 1; j <= x + 1; j++) {
-                    if ((j >= 0 && j < x) && (i >= 0 && i < y)) {
-                        if (game[j][i] == this.mineValue) {
+                    if ((j >= 0 && j < this.sizeX) && (i >= 0 && i < this.sizeY)) {
+                        if (game[i][j] == this.mineValue) {
                             bombCount++;
                         }
                     }
@@ -299,9 +300,9 @@ var MinesweeperApp;
         }
         isSolved(x, y, game) {
             // Checks to see if the current game is solved
-            for (var i = 0; i < y; i++) {
-                for (var j = 0; j < x; j++) {
-                    if (game[j][i] === undefined) {
+            for (var i = 0; i < this.sizeY; i++) {
+                for (var j = 0; j < this.sizeX; j++) {
+                    if (game[i][j] === undefined) {
                         return false;
                     }
                 }
@@ -311,8 +312,8 @@ var MinesweeperApp;
         solveGame(x, y, game) {
             for (var i = 0; i < y; i++) {
                 for (var j = 0; j < x; j++) {
-                    if (game[j][i] === undefined) {
-                        game[j][i] = this.countMines(j, i, game);
+                    if (game[i][j] === undefined) {
+                        game[i][j] = this.countMines(j, i, game);
                     }
                 }
             }
@@ -333,6 +334,21 @@ var MinesweeperApp;
             }
             return game;
         }
+        createEmptyBooleanArray(x, y) {
+            var arr = new Array();
+            for (var i = 0; i < y; i++) {
+                var tmp = new Array();
+                for (var j = 0; j < x; j++) {
+                    tmp.push(false);
+                }
+                arr.push(tmp);
+            }
+            return arr;
+        }
+        setGameSize(x, y) {
+            this.sizeX = x;
+            this.sizeY = y;
+        }
     }
     GameService.$inject = ['$q'];
     MinesweeperApp.GameService = GameService;
@@ -349,12 +365,12 @@ var MinesweeperApp;
                     displayClass = "marked-mine";
                     break;
                 case -1:
-                    if (failedGame) {
+                    /*if (failedGame) {
                         displayClass = "mine";
-                    }
-                    else {
+                    } else {
                         displayClass = "blank";
-                    }
+                    }*/
+                    displayClass = "mine";
                     break;
                 case 0:
                     displayClass = "no-mine";
