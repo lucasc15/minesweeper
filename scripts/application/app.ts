@@ -37,6 +37,11 @@ module MinesweeperApp {
                 templateUrl: "templates/score.html",
                 controller: ScoreController
             })
+            .state("otherwise", {
+                url: "*path",
+                templateUrl: "templates/home.html",
+                controller: HomeController
+            });
     }
     routeConfig.$inject = ['$stateProvider']
 

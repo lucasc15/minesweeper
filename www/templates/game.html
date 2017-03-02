@@ -1,16 +1,18 @@
-﻿<div class="game-container">
-    <div class="mine-counter">{{ gameData.mineDisplayCount }}</div>
-    <div class="time-counter">{{ gameData.timeCount }}</div>
-    <div ng-hide="gameData.gameFailed || gameData.isSolved">
-        <div class="game-row" ng-repeat="row in game">
-            <div ng-repeat="cell in row" ng-class="getClass($index, parent.$index)" ng-click="makeMove($index, parent.$index)"></div>
+﻿<div class="mine-counter">{{ vm.gameData.mineDisplayCount }}</div>
+<div class="time-counter">{{ vm.ameData.timeCount }}</div>
+<div class="game-container">
+    <div ng-hide="vm.gameData.gameFailed || vm.gameData.isSolved">
+        <div class="game-row" ng-repeat="row in vm.game track by $index">
+            <div ng-repeat="cell in row track by $index" ng-class="vm.getClass($index, parent.$index)" class="base" ng-click="vm.makeMove($index, parent.$index)">
+                &nbsp;
+            </div>
         </div>
     </div>
-    <div ng-hide="!gameData.gameFailed">
+    <div ng-hide="!vm.gameData.gameFailed">
         <p>You Lose!</p>
         <a ui-sref="home">Try Again!</a>
     </div>
-    <div ng-hide="!gameData.isSolved">
+    <div ng-hide="!vm.gameData.isSolved">
         <p>you Win!</p>
         <a ui-sref="game-config-size">Play Again!</a>
     </div>

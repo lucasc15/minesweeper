@@ -33,21 +33,19 @@ module MinesweeperApp {
         public markedValue: number;
 
         constructor(private $q: ng.IQService) {
-            console.log("Game service init!!");
             this.mineValue = -1;
             this.markedValue = -2;
         }
 
         loadGame(x: number, y: number, mineCount: number): Array<Array<number>> {
-            // TODO create the array to be undefined
-            var game = [...Array(y)].map(i => Array(x));
+            var game = this.createEmptyArray(x, y);
             var randX: number, randY: number;
             // Randomly pick indices
             while (mineCount > 0) {
-                randX = this.randomIntFromInterval(0, x);
-                randY = this.randomIntFromInterval(0, y);
-                if (!game[randX][randY]) {
-                    game[randX][randY] = -1;
+                randX = this.randomIntFromInterval(0, x - 1);
+                randY = this.randomIntFromInterval(0, y - 1);
+                if (game[randY][randX] === undefined) {
+                    game[randY][randX] = -1;
                     mineCount--;
                 }
             }
@@ -138,6 +136,18 @@ module MinesweeperApp {
             // Used to choose a game[rand][rand] place for a bomb placement
             return Math.floor(Math.random() * (max - min + 1) + min);
         }
+
+        private createEmptyArray(x: number, y: number): Array<Array<number>> {
+            var game = new Array();
+            for (var i = 0; i < y; i++) {
+                var tmp = new Array();
+                for (var j = 0; j < x; j++) {
+                    tmp.push(undefined);
+                }
+                game.push(tmp);
+            }
+            return game;
+        }
     }
 
     angular.module('minesweeperApp').service('gameService', GameService);
@@ -146,16 +156,13 @@ module MinesweeperApp {
     export interface IClassEnumService {
         // Interface to determine the display of a square based on its mine value. Display is defined in game.css
         getClass(value: number, failedGame: boolean): string;
-        baseClass: string;
     }
 
     export class MineDisplayService implements IClassEnumService {
 
         static $inject = ['$q'];
-        baseClass: string;
 
         constructor(private $q: ng.IQService) {
-            this.baseClass = "square";
         }
 
         getClass(value: number, failedGame: boolean): string {
@@ -202,7 +209,7 @@ module MinesweeperApp {
                 default:
                     displayClass = "blank"
             }
-            return this.baseClass + ' ' + displayClass;
+            return displayClass;
         }
     }
     angular.module('minesweeperApp').service('mineDisplayService', MineDisplayService);

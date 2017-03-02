@@ -1,4 +1,57 @@
-﻿body {
+﻿body, html {
+    min-height: 100%;
+}
+
+.mine-counter {
+    float: left;
+    width: 40%;
+    margin-left: 2%;
+    padding: 0;
+    text-align: right;
+}
+
+.mine-counter:after {
+    content: "seconds";
+}
+
+.mine-counter {
+    float: right;
+    width: 40%;
+    margin-right: 2%;
+    padding: 0;
+    text-align: right;
+}
+
+.mine-counter {
+    content: "mines";
+}
+
+.game-container {
+    width: 98%;
+    min-height: 100%;
+    padding: 1%;
+    margin: 2%;
+    box-sizing: border-box;
+}
+
+.game-row {
+    position: relative;
+    min-height: 10%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: auto hidden;
+}
+
+.base {
+    float: left;
+    width: 10%;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    min-height: 100%;
+    border: 1px solid black;
 }
 
 .marked-mine {

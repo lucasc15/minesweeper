@@ -6,9 +6,10 @@
         public $scope: ng.IScope;
         private $interval: ng.IIntervalService;
         private timeCounter: any;
-        private game: Array<Array<number>>;
         private gameService: IGameService;
         private mineDisplayService: IClassEnumService;
+        public gameData: GameData;
+        public game: Array<Array<number>>;
 
         constructor(
             $scope: ng.IScope,
@@ -17,29 +18,23 @@
             gameService: GameService,
             mineDisplayService: MineDisplayService
         ) {
-            console.log("Game constructor");
-            // Use URL angular route to accept these values to start a new game
-            // services/dependencies to register with the controller
+            // Bind scope to controller fields
+            $scope.vm = this;
+            // Setup services
             this.gameService = gameService;
             this.mineDisplayService = mineDisplayService;
-            console.log("Registered services")
-            // Initialize $scope binding
-            this.$scope = $scope;
-            this.$scope.gameData = new GameData($stateParams.x, $stateParams.y, $stateParams.difficulty / 100);
-            console.log('initialized scope data');
-            // Game state settings/loading
-            this.loadGame(this.$scope.gameData.x, this.$scope.gameData.y, this.$scope.gameData.mineCount);
+            // Setup Game
+            this.gameData = new GameData($stateParams.x, $stateParams.y, $stateParams.difficulty);
+            this.loadGame(this.gameData.x, this.gameData.y, this.gameData.difficulty);
             // Start game timer
-            console.log('loaded game');
             this.$interval = $interval;
-            console.log("got here!");
-            this.timeCounter = $interval(this.gameTimer, 1000)
-            console.log("end of constructor");
+            this.timeCounter = this.$interval(() => this.gameTimer(), 1000);
         }
 
-        public loadGame(x: number, y: number, mineCount: number) {
+        private loadGame(x: number, y: number, mineCount: number) {
             // Initalizes a game based on the size (x, y) and a difficulty (mine count)
-            this.game = this.gameService.loadGame(x, y, mineCount);
+            // this.$scope.game = this.gameService.loadGame(x, y, mineCount);
+            this.game = this.gameService.loadGame(x, y, mineCount)
         }
 
         public makeMove(x: number, y: number): void {
@@ -47,35 +42,32 @@
             if (!this.gameService.makeMove(x, y, this.game)) {
                 this.failedGame();
             }
-            this.$scope.gameData.isSolved = this.gameService.isSolved(
-                this.$scope.gameData.x, this.$scope.gameData.y, this.game);
+            this.gameData.isSolved = this.gameService.isSolved(
+                this.gameData.x, this.gameData.y, this.game);
         }
 
+        // use like <tag ng-class="getClass(x, y)"/>
         public getClass(x: number, y: number): string {
             // Wrapper to determine the style (class) of a square based on its state/mine value
-            return this.mineDisplayService.getClass(this.game[x][y], this.$scope.gameData.gameFailed);
+            return this.mineDisplayService.getClass(this.game[x][y], this.gameData.gameFailed);
         }
 
         public markMine(x: number, y: number): void {
             // Player marks a square as a mine. Not activated as how does right clicking work on the app?
-            this.$scope.gameData.mineDisplayCount += this.gameService.markMine(x, y, this.game);
-        }
-
-        // use like <tag ng-class="getMineDisplay(x, y)"/>
-        public getMineDisplay(x, y): string {
-            // Uses a service related to the game service that applies the class to display every game square
-            return this.mineDisplayService.getClass(this.game[x][y], this.$scope.gameData.gameFailed);
+            this.gameData.mineDisplayCount += this.gameService.markMine(x, y, this.game);
         }
 
         private failedGame(): void {
             // Changed game state to failed, notifies view
             this.$interval.cancel(this.timeCounter);
-            this.$scope.gameData.gameFailed = true;
+            this.gameData.gameFailed = true;
         }
 
+        // private gameTimer($scope: ng.IScope): void {
         private gameTimer(): void {
             // Function to be run in a setInterval to track time passed since game start
-            this.$scope.gameData.timeCount++;
+            // $scope.gameData.timeCount++;
+            this.gameData.timeCount++;
         }
     }
 

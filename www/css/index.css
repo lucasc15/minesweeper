@@ -107,3 +107,7 @@ h1 {
 .option-selection-wrapper a {
     margin-top: 10% !important;
 }
+
+.ui-view {
+    min-height: 100%;
+}
