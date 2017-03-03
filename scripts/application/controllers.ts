@@ -11,6 +11,7 @@
         public gameData: GameData;
         public game: Array<Array<number>>;
         public markingCursor: boolean;
+        public mineMarkerText: string;
 
         constructor(
             $scope: ng.IScope,
@@ -22,6 +23,7 @@
             // Bind scope to controller fields
             $scope.vm = this;
             this.markingCursor = false;
+            this.mineMarkerText = "Activate Marker";
             // Setup services
             this.gameService = gameService;
             this.mineDisplayService = mineDisplayService;
@@ -51,10 +53,13 @@
             if (!this.gameService.makeMove(x, y, this.game)) {
                 this.failedGame();
             }
-            this.gameData.isSolved = this.gameService.isSolved(
-                this.gameData.x, this.gameData.y, this.game);
-            if (this.gameData.isSolved) {
+            if (this.gameService.isSolved(this.game)) {
+                this.gameData.isSolved = true;
                 this.$interval.cancel(this.timeCounter);
+            }
+            if (this.gameData.mineDisplayCount != this.gameData.mineCount) {
+                this.gameData.mineDisplayCount =
+                    this.gameData.mineCount - this.gameService.updateMineCount(this.game);
             }
         }
 
@@ -66,13 +71,15 @@
 
         public toggleMineMarker(): void {
             this.markingCursor = !this.markingCursor;
+            this.mineMarkerText = (this.markingCursor) ?
+                "Deactivate Marker" : "Activate Marker";
         }
 
         public getMineMarkerClass(): string {
             if (this.markingCursor) {
-                return "marker-activated";
+                return 'marker-activated button button-block button-positive';
             }
-            return "marker-deactivated";
+            return 'marker-deactivated button button-block button-calm';
         }
 
         public markMine(x: number, y: number): void {

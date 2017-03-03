@@ -2,6 +2,18 @@
     min-height: 100%;
 }
 
+div img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+img .marker-header {
+    margin: auto auto;
+    width: 10px;
+    height: 10px;
+}
+
 .time-counter {
     position: relative;
     float: left;
@@ -27,24 +39,26 @@
 }
 
 .marker-activated {
-    width: 33%;
+    width: 67%;
+    height: 25px;
     float: left;
     position: relative;
-    margin: 0 auto;
+    margin: 0 16%;
 }
 
 .marker-deactivated {
-    width: 33%;
+    width: 67%;
+    height: 25px;
     float: left;
     position: relative;
-    margin: 0 auto;
+    margin: 0 16%;
 }
 
 .game-container {
     width: 98%;
     min-height: 100%;
     padding: 1%;
-    margin: 2%;
+    margin: 0 auto;
     box-sizing: border-box;
     clear: both;
 }
@@ -52,6 +66,7 @@
 .game-row {
     position: relative;
     min-height: 10%;
+    /* height: 25px; */
     width: 100%;
     margin: 0;
     padding: 0;
@@ -62,6 +77,8 @@
 .base {
     float: left;
     width: 10%;
+    /* width: 25px;
+    height: 25px; */
     box-sizing: border-box;
     padding: 0;
     margin: 0;
@@ -70,26 +87,33 @@
 }
 
 .marked-mine {
-    background-image: url();
+    background-image: url("/images/FlaggedCell.png");
+    background-size: cover;
+    /* background-color: yellow; */
 }
 
 .mine {
-    /*background-image: url();*/
+    /* background-image: url("/images/Cell.png"); */
     background-color: blue;
 }
 
 .blank {
-	background-color: red;
+	/* background-color: red; */
+    background-image: url("/images/Cell.png");
+    background-size: cover;
 }
 
 .no-mine {
-	background-color: grey;
+	/* background-color: grey; */
+    background-image: url("/images/CellDown.png");
+    background-size: cover;
 }
 
 .one-mine {
 	background-image: url("data:image/svg+xml;utf8,\
 						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='50px'>\
 						  <text x='15' y='10' fill='blue' font-size='20' text-anchor='middle' alignment-baseline='central'>1</text></svg>");
+    background-color: lightblue; 
 }
 
 .two-mine {
@@ -98,51 +122,66 @@
 						  <text x='15' y='10' fill='green' font-size='20' text-anchor='middle' alignment-baseline='central'>\
                             2\
                           </text></svg>");
+    background-color: lightblue; 
 }
 
 .three-mine {
-background-image: url("data:image/svg+xml;utf8,\
-						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
-						  <text x='15' y='10' fill='yellow' font-size='20' text-anchor='middle' alignment-baseline='central'>\
-                            3\
-                          </text></svg>");}
+    background-image: url("data:image/svg+xml;utf8,\
+						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						      <text x='15' y='10' fill='yellow' font-size='20' text-anchor='middle' alignment-baseline='central'>\
+                                3\
+                              </text></svg>");
+    background-color: lightblue; 
+}
 
 .four-mine {
-background-image: url("data:image/svg+xml;utf8,\
-						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
-						  <text x='15' y='10' fill='orange' font-size='20' text-anchor='middle' alignment-baseline='central'>\
-                            4\
-                          </text></svg>");
+    background-image: url("data:image/svg+xml;utf8,\
+						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						      <text x='15' y='10' fill='orange' font-size='20' text-anchor='middle' alignment-baseline='central'>\
+                                4\
+                              </text></svg>");
+    background-color: lightblue; 
 }
 
 .five-mine {
-background-image: url("data:image/svg+xml;utf8,\
-						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
-						  <text x='15' y='10' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
-                            5\
-                          </text></svg>");
+    background-image: url("data:image/svg+xml;utf8,\
+						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						      <text x='15' y='10' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
+                                5\
+                              </text></svg>");
+    background-color: lightblue; 
 }
 
 .six-mine {
-background-image: url("data:image/svg+xml;utf8,\
-						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
-						  <text x='15' y='10' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
-                            6\
-                          </text></svg>");
+    background-image: url("data:image/svg+xml;utf8,\
+						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						      <text x='15' y='10' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
+                                6\
+                              </text></svg>");
+    background-color: lightblue; 
 }
 
 .seven-mine {
-background-image: url("data:image/svg+xml;utf8,\
-						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
-						  <text x='15' y='10' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
-                            7\
-                          </text></svg>");
+    background-image: url("data:image/svg+xml;utf8,\
+						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						      <text x='15' y='10' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
+                                7\
+                              </text></svg>");
+    background-color: lightblue; 
 }
 
 .eight-mine {
-background-image: url("data:image/svg+xml;utf8,\
-						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
-						  <text x='15' y='10' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
-                            8\
-                          </text></svg>");
+    background-image: url("data:image/svg+xml;utf8,\
+						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
+						      <text x='15' y='10' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
+                                8\
+                              </text></svg>");
+    background-color: lightblue; 
+}
+
+.notification-box {
+    position: fixed;
+    top: 10%;
+    margin: 0 auto;
+    width: 100%;
 }

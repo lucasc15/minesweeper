@@ -16,14 +16,17 @@ module MinesweeperApp {
         makeMove(x: number, y: number, game: Array<Array<number>>): boolean;
         // Function to mark a suspected mine
         markMine(x: number, y: number, game: Array<Array<number>>): number;
+        // Function to update mine count if improperly flagged circle
+        updateMineCount(game: Array<Array<number>>): number;
         // Function to check if the game is solved
-        isSolved(x: number, y: number, game: Array<Array<number>>): boolean;
+        isSolved(game: Array<Array<number>>): boolean;
         // Function to restart the game
         resetGame(game: Array<Array<number>>): void;
         // This is the service value that represents a bomb, selected to be -1;
         mineValue: number;
 
         /* Mine values:
+            -3:         Marked Mine that is a Mine: will display marked flag on a mine;
             -2:         Marked Mine: will display a black square with a 'flag' marker; need to figure out cursor ui
             -1:         Mine: will remain covered until gameState = failed
             undefined:  Covered/unknown by player
@@ -36,12 +39,14 @@ module MinesweeperApp {
         static $inject = ['$q'];
         public mineValue: number;
         public markedValue: number;
+        public markedMineValue: number;
         private sizeX: number;
         private sizeY: number;
 
         constructor(private $q: ng.IQService) {
             this.mineValue = -1;
             this.markedValue = -2;
+            this.markedMineValue = -3;
         }
 
         loadGame(mineCount: number): Array<Array<number>> {
@@ -66,10 +71,13 @@ module MinesweeperApp {
                 // Allow unselected squares to be marked only
                 game[y][x] = this.markedValue;
                 return -1;
-            } else if (game[y][x] == -2) {
+            } else if (game[y][x] == this.markedValue) {
                 // case to unmark squares
                 game[y][x] = undefined;
                 return 1;
+            } else if (game[y][x] == this.mineValue) {
+                game[y][x] = this.markedMineValue;
+                return -1;
             } else {
                 return 0;
             }
@@ -80,6 +88,9 @@ module MinesweeperApp {
             if (game[y][x] < 0 || game[y][x] === undefined) {
                 if (game[y][x] == this.mineValue) {
                     return false;
+                }
+                if (game[y][x] == this.markedMineValue || game[y][x] == this.markedValue) {
+                    return true;
                 }
                 game[y][x] = this.countMines(x, y, game);
                 if (game[y][x] == 0) {
@@ -114,7 +125,7 @@ module MinesweeperApp {
             for (var i = y - 1; i <= y + 1; i++) {
                 for (var j = x - 1; j <= x + 1; j++) {
                     if ((j >= 0 && j < this.sizeX) && (i >= 0 && i < this.sizeY)) {
-                        if (game[i][j] == this.mineValue) {
+                        if (game[i][j] == this.mineValue || game[i][j] == this.markedMineValue) {
                             bombCount++;
                         }
                     }
@@ -123,7 +134,7 @@ module MinesweeperApp {
             return bombCount;
         }
 
-        public isSolved(x: number, y: number, game: Array<Array<number>>) {
+        public isSolved(game: Array<Array<number>>) {
             // Checks to see if the current game is solved
             for (var i = 0; i < this.sizeY; i++) {
                 for (var j = 0; j < this.sizeX; j++) {
@@ -135,14 +146,26 @@ module MinesweeperApp {
             return true;
         }
 
-        public solveGame(x: number, y: number, game: Array<Array<number>>): void {
-            for (var i = 0; i < y; i++) {
-                for (var j = 0; j < x; j++) {
+        public solveGame(game: Array<Array<number>>): void {
+            for (var i = 0; i < this.sizeY; i++) {
+                for (var j = 0; j < this.sizeX; j++) {
                     if (game[i][j] === undefined) {
                         game[i][j] = this.countMines(j, i, game)
                     }
                 }
             }
+        }
+
+        public updateMineCount(game: Array<Array<number>>): number {
+            var markedMineCount = 0;
+            for (var i = 0; i < this.sizeY; i++) {
+                for (var j = 0; j < this.sizeX; j++) {
+                    if (game[i][j] == this.markedMineValue) {
+                        markedMineCount++;
+                    }
+                }
+            }
+            return markedMineCount;
         }
 
         private randomIntFromInterval(min: number, max: number) {
@@ -152,6 +175,7 @@ module MinesweeperApp {
         }
 
         private createEmptyArray(x: number, y: number): Array<Array<number>> {
+            // Helper function to create an empty array of all undefined values as preliminary game structure
             var game = new Array();
             for (var i = 0; i < y; i++) {
                 var tmp = new Array();
@@ -164,6 +188,7 @@ module MinesweeperApp {
         }
 
         private createEmptyBooleanArray(x: number, y: number): Array<Array<boolean>> {
+            // Helper function to create array the same size of the game to keep track of searched squares; initalizes as all false values
             var arr = new Array();
             for (var i = 0; i < y; i++) {
                 var tmp = new Array();
@@ -176,6 +201,7 @@ module MinesweeperApp {
         }
 
         public setGameSize(x: number, y: number): void {
+            // Helper function to set a reference to a game size;
             this.sizeX = x;
             this.sizeY = y;
         }
@@ -190,7 +216,7 @@ module MinesweeperApp {
             }
         }
     }
-
+    // Need to register service to app in this file, otherwise it is undefined in angularJS for some reason
     angular.module('minesweeperApp').service('gameService', GameService);
     
 
@@ -210,16 +236,20 @@ module MinesweeperApp {
             // Helper function to determine current state of a tile and return the class value for the square
             var displayClass: string;
             switch (value) {
+                case -3:
+                    displayClass = "marked-mine";
                 case -2:
                     displayClass = "marked-mine";
                     break;
                 case -1:
-                    /*if (failedGame) {
+                    // TODO remove redebugging lines here when finished!
+                    if (failedGame) {
                         displayClass = "mine";
                     } else {
                         displayClass = "blank";
-                    }*/
-                    displayClass = "mine";
+                    }
+                    // TODO commend above and uncomment below for debugging/ to see mines
+                    // displayClass = "mine";
                     break;
                 case 0:
                     displayClass = "no-mine";

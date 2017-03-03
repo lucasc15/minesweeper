@@ -94,6 +94,8 @@ var MinesweeperApp;
         constructor($scope, $stateParams, $interval, gameService, mineDisplayService) {
             // Bind scope to controller fields
             $scope.vm = this;
+            this.markingCursor = false;
+            this.mineMarkerText = "Activate Marker";
             // Setup services
             this.gameService = gameService;
             this.mineDisplayService = mineDisplayService;
@@ -112,18 +114,39 @@ var MinesweeperApp;
         }
         makeMove(x, y) {
             // Makes a move and changes game state through game service, then checks if it is solved
+            // If is marking cursor mode
+            if (this.markingCursor) {
+                this.markMine(x, y);
+                return;
+            }
+            // If in not mine marking mode;
             if (!this.gameService.makeMove(x, y, this.game)) {
                 this.failedGame();
             }
-            this.gameData.isSolved = this.gameService.isSolved(this.gameData.x, this.gameData.y, this.game);
-            if (this.gameData.isSolved) {
+            if (this.gameService.isSolved(this.game)) {
+                this.gameData.isSolved = true;
                 this.$interval.cancel(this.timeCounter);
+            }
+            if (this.gameData.mineDisplayCount != this.gameData.mineCount) {
+                this.gameData.mineDisplayCount =
+                    this.gameData.mineCount - this.gameService.updateMineCount(this.game);
             }
         }
         // use like <tag ng-class="getClass(x, y)"/> where x/y is column/row
         getClass(x, y) {
             // Wrapper to determine the style (class) of a square based on its state/mine value
             return this.mineDisplayService.getClass(this.game[y][x], this.gameData.gameFailed);
+        }
+        toggleMineMarker() {
+            this.markingCursor = !this.markingCursor;
+            this.mineMarkerText = (this.markingCursor) ?
+                "Deactivate Marker" : "Activate Marker";
+        }
+        getMineMarkerClass() {
+            if (this.markingCursor) {
+                return 'marker-activated button button-block button-positive';
+            }
+            return 'marker-deactivated button button-block button-calm';
         }
         markMine(x, y) {
             // Player marks a square as a mine. Not activated as how does right clicking work on the app?
@@ -225,6 +248,7 @@ var MinesweeperApp;
             this.$q = $q;
             this.mineValue = -1;
             this.markedValue = -2;
+            this.markedMineValue = -3;
         }
         loadGame(mineCount) {
             var game = this.createEmptyArray(this.sizeX, this.sizeY);
@@ -248,10 +272,14 @@ var MinesweeperApp;
                 game[y][x] = this.markedValue;
                 return -1;
             }
-            else if (game[y][x] == -2) {
+            else if (game[y][x] == this.markedValue) {
                 // case to unmark squares
                 game[y][x] = undefined;
                 return 1;
+            }
+            else if (game[y][x] == this.mineValue) {
+                game[y][x] = this.markedMineValue;
+                return -1;
             }
             else {
                 return 0;
@@ -263,23 +291,16 @@ var MinesweeperApp;
                 if (game[y][x] == this.mineValue) {
                     return false;
                 }
-                var mineCount = this.countMines(x, y, game);
-                game[y][x] = mineCount;
-                console.log(game[y][x]);
-                console.log(game[y][x] == 0);
+                if (game[y][x] == this.markedMineValue || game[y][x] == this.markedValue) {
+                    return true;
+                }
+                game[y][x] = this.countMines(x, y, game);
                 if (game[y][x] == 0) {
-                    console.log("search!");
                     var searched = this.createEmptyBooleanArray(this.sizeX, this.sizeY);
                     this.searchMove(x, y, game, searched);
                 }
-                console.log('inside makeMove');
-                console.log("x: " + x);
-                console.log("y: " + y);
-                console.log(game[y][x]);
                 return true;
             }
-            console.log('outside makeMove');
-            console.log(game[y][x]);
             return true;
         }
         searchMove(x, y, game, searched) {
@@ -304,7 +325,7 @@ var MinesweeperApp;
             for (var i = y - 1; i <= y + 1; i++) {
                 for (var j = x - 1; j <= x + 1; j++) {
                     if ((j >= 0 && j < this.sizeX) && (i >= 0 && i < this.sizeY)) {
-                        if (game[i][j] == this.mineValue) {
+                        if (game[i][j] == this.mineValue || game[i][j] == this.markedMineValue) {
                             bombCount++;
                         }
                     }
@@ -312,7 +333,7 @@ var MinesweeperApp;
             }
             return bombCount;
         }
-        isSolved(x, y, game) {
+        isSolved(game) {
             // Checks to see if the current game is solved
             for (var i = 0; i < this.sizeY; i++) {
                 for (var j = 0; j < this.sizeX; j++) {
@@ -323,14 +344,25 @@ var MinesweeperApp;
             }
             return true;
         }
-        solveGame(x, y, game) {
-            for (var i = 0; i < y; i++) {
-                for (var j = 0; j < x; j++) {
+        solveGame(game) {
+            for (var i = 0; i < this.sizeY; i++) {
+                for (var j = 0; j < this.sizeX; j++) {
                     if (game[i][j] === undefined) {
                         game[i][j] = this.countMines(j, i, game);
                     }
                 }
             }
+        }
+        updateMineCount(game) {
+            var markedMineCount = 0;
+            for (var i = 0; i < this.sizeY; i++) {
+                for (var j = 0; j < this.sizeX; j++) {
+                    if (game[i][j] == this.markedMineValue) {
+                        markedMineCount++;
+                    }
+                }
+            }
+            return markedMineCount;
         }
         randomIntFromInterval(min, max) {
             // Helper function to choose a random number between min and max
@@ -338,6 +370,7 @@ var MinesweeperApp;
             return Math.floor(Math.random() * (max - min + 1) + min);
         }
         createEmptyArray(x, y) {
+            // Helper function to create an empty array of all undefined values as preliminary game structure
             var game = new Array();
             for (var i = 0; i < y; i++) {
                 var tmp = new Array();
@@ -349,6 +382,7 @@ var MinesweeperApp;
             return game;
         }
         createEmptyBooleanArray(x, y) {
+            // Helper function to create array the same size of the game to keep track of searched squares; initalizes as all false values
             var arr = new Array();
             for (var i = 0; i < y; i++) {
                 var tmp = new Array();
@@ -360,6 +394,7 @@ var MinesweeperApp;
             return arr;
         }
         setGameSize(x, y) {
+            // Helper function to set a reference to a game size;
             this.sizeX = x;
             this.sizeY = y;
         }
@@ -375,6 +410,7 @@ var MinesweeperApp;
     }
     GameService.$inject = ['$q'];
     MinesweeperApp.GameService = GameService;
+    // Need to register service to app in this file, otherwise it is undefined in angularJS for some reason
     angular.module('minesweeperApp').service('gameService', GameService);
     class MineDisplayService {
         constructor($q) {
@@ -384,16 +420,21 @@ var MinesweeperApp;
             // Helper function to determine current state of a tile and return the class value for the square
             var displayClass;
             switch (value) {
+                case -3:
+                    displayClass = "marked-mine";
                 case -2:
                     displayClass = "marked-mine";
                     break;
                 case -1:
-                    /*if (failedGame) {
+                    // TODO remove redebugging lines here when finished!
+                    if (failedGame) {
                         displayClass = "mine";
-                    } else {
+                    }
+                    else {
                         displayClass = "blank";
-                    }*/
-                    displayClass = "mine";
+                    }
+                    // TODO commend above and uncomment below for debugging/ to see mines
+                    // displayClass = "mine";
                     break;
                 case 0:
                     displayClass = "no-mine";
