@@ -1,5 +1,6 @@
 ﻿<div class="mine-counter">{{ vm.gameData.mineDisplayCount }}</div>
-<div class="time-counter">{{ vm.ameData.timeCount }}</div>
+<div ng-class="vm.getMineMarkerClass()" ng-click="vm.toggleMineMarker()"></div>
+<div class="time-counter">{{ vm.gameData.timeCount }}</div>
 <div class="game-container">
     <div ng-hide="vm.gameData.gameFailed || vm.gameData.isSolved">
         <div class="game-row" ng-repeat="row in vm.game track by $index">
@@ -8,12 +9,13 @@
             </div>
         </div>
     </div>
-    <div ng-hide="!vm.gameData.gameFailed">
+    <div class="notification-box" ng-hide="!vm.gameData.gameFailed">
         <p>You Lose!</p>
         <a ui-sref="home">Try Again!</a>
     </div>
-    <div ng-hide="!vm.gameData.isSolved">
-        <p>you Win!</p>
-        <a ui-sref="game-config-size">Play Again!</a>
+    <div class="notification-box" ng-hide="!vm.gameData.isSolved">
+        <p class="button button-block button-positive">you Win!</p>
+        <a ui-sref="game-config-size" class="button button-block button-positive">Play Again!</a>
+        <p class="button button-block button-positive" ng-click="vm.resetGame()">Replay Game</p>
     </div>
 </div>

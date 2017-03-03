@@ -10,6 +10,7 @@
         private mineDisplayService: IClassEnumService;
         public gameData: GameData;
         public game: Array<Array<number>>;
+        public markingCursor: boolean;
 
         constructor(
             $scope: ng.IScope,
@@ -20,6 +21,7 @@
         ) {
             // Bind scope to controller fields
             $scope.vm = this;
+            this.markingCursor = false;
             // Setup services
             this.gameService = gameService;
             this.mineDisplayService = mineDisplayService;
@@ -29,7 +31,7 @@
             this.loadGame(this.gameData.mineCount);
             // Start game timer
             this.$interval = $interval;
-            this.startTimer();
+            this.startTime();
             console.log(this.game);
         }
 
@@ -40,17 +42,37 @@
 
         public makeMove(x: number, y: number): void {
             // Makes a move and changes game state through game service, then checks if it is solved
+            // If is marking cursor mode
+            if (this.markingCursor) {
+                this.markMine(x, y);
+                return
+            }
+            // If in not mine marking mode;
             if (!this.gameService.makeMove(x, y, this.game)) {
                 this.failedGame();
             }
             this.gameData.isSolved = this.gameService.isSolved(
                 this.gameData.x, this.gameData.y, this.game);
+            if (this.gameData.isSolved) {
+                this.$interval.cancel(this.timeCounter);
+            }
         }
 
         // use like <tag ng-class="getClass(x, y)"/> where x/y is column/row
         public getClass(x: number, y: number): string {
             // Wrapper to determine the style (class) of a square based on its state/mine value
             return this.mineDisplayService.getClass(this.game[y][x], this.gameData.gameFailed);
+        }
+
+        public toggleMineMarker(): void {
+            this.markingCursor = !this.markingCursor;
+        }
+
+        public getMineMarkerClass(): string {
+            if (this.markingCursor) {
+                return "marker-activated";
+            }
+            return "marker-deactivated";
         }
 
         public markMine(x: number, y: number): void {
@@ -74,14 +96,13 @@
             this.timeCounter = this.$interval(() => this.gameTimer(), 1000);
         }
 
-        private restartGame(): void {
+        private resetGame(): void {
             this.gameService.resetGame(this.game);
             this.gameData.timeCount = 0;
             this.startTime();
             this.gameData.gameFailed = false;
             this.gameData.isSolved = false;
         }
-        
     }
 
     export class GameConfigController {
@@ -170,7 +191,8 @@
             this.x = x;
             this.y = y;
             this.difficulty = difficulty;
-            this.mineCount = Math.floor(this.x * this.y * this.difficulty / 100);
+            this.mineCount = this.mineDisplayCount =
+                Math.floor(this.x * this.y * this.difficulty / 100);
             this.isSolved = false;
             this.gameFailed = false;
             this.timeCount = 0;

@@ -2,28 +2,42 @@
     min-height: 100%;
 }
 
-.mine-counter {
+.time-counter {
+    position: relative;
     float: left;
-    width: 40%;
+    width: 45%;
     margin-left: 2%;
     padding: 0;
-    text-align: right;
 }
 
-.mine-counter:after {
-    content: "seconds";
+.time-counter:after {
+    content: "    seconds";
 }
 
 .mine-counter {
     float: right;
-    width: 40%;
+    width: 45%;
     margin-right: 2%;
     padding: 0;
     text-align: right;
 }
 
-.mine-counter {
-    content: "mines";
+.mine-counter:after {
+    content: "  mines";
+}
+
+.marker-activated {
+    width: 33%;
+    float: left;
+    position: relative;
+    margin: 0 auto;
+}
+
+.marker-deactivated {
+    width: 33%;
+    float: left;
+    position: relative;
+    margin: 0 auto;
 }
 
 .game-container {
@@ -32,6 +46,7 @@
     padding: 1%;
     margin: 2%;
     box-sizing: border-box;
+    clear: both;
 }
 
 .game-row {

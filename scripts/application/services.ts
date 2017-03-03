@@ -81,23 +81,13 @@ module MinesweeperApp {
                 if (game[y][x] == this.mineValue) {
                     return false;
                 }
-                var mineCount = this.countMines(x, y, game);
-                game[y][x] = mineCount;
-                console.log(game[y][x]);
-                console.log(game[y][x] == 0);
+                game[y][x] = this.countMines(x, y, game);
                 if (game[y][x] == 0) {
-                    console.log("search!");
                     var searched = this.createEmptyBooleanArray(this.sizeX, this.sizeY);
                     this.searchMove(x, y, game, searched);
                 }
-                console.log('inside makeMove');
-                console.log("x: " + x);
-                console.log("y: " + y);
-                console.log(game[y][x]);
                 return true;
             }
-            console.log('outside makeMove');
-            console.log(game[y][x]);
             return true;
         }
 
@@ -194,7 +184,7 @@ module MinesweeperApp {
             for (var i = 0; i < this.sizeY; i++) {
                 for (var j = 0; j < this.sizeX; j++) {
                     if (game[i][j] != this.mineValue) {
-                        game[i][j] == undefined;
+                        game[i][j] = undefined;
                     }
                 }
             }

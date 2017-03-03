@@ -103,7 +103,7 @@ var MinesweeperApp;
             this.loadGame(this.gameData.mineCount);
             // Start game timer
             this.$interval = $interval;
-            this.timeCounter = this.$interval(() => this.gameTimer(), 1000);
+            this.startTime();
             console.log(this.game);
         }
         loadGame(mineCount) {
@@ -116,6 +116,9 @@ var MinesweeperApp;
                 this.failedGame();
             }
             this.gameData.isSolved = this.gameService.isSolved(this.gameData.x, this.gameData.y, this.game);
+            if (this.gameData.isSolved) {
+                this.$interval.cancel(this.timeCounter);
+            }
         }
         // use like <tag ng-class="getClass(x, y)"/> where x/y is column/row
         getClass(x, y) {
@@ -135,6 +138,16 @@ var MinesweeperApp;
         gameTimer() {
             // Function to be run in a setInterval to track time passed since game start
             this.gameData.timeCount++;
+        }
+        startTime() {
+            this.timeCounter = this.$interval(() => this.gameTimer(), 1000);
+        }
+        resetGame() {
+            this.gameService.resetGame(this.game);
+            this.gameData.timeCount = 0;
+            this.startTime();
+            this.gameData.gameFailed = false;
+            this.gameData.isSolved = false;
         }
     }
     // Controller to store game state and create wrapper functions for the GameService interface
@@ -193,7 +206,8 @@ var MinesweeperApp;
             this.x = x;
             this.y = y;
             this.difficulty = difficulty;
-            this.mineCount = Math.floor(this.x * this.y * this.difficulty / 100);
+            this.mineCount = this.mineDisplayCount =
+                Math.floor(this.x * this.y * this.difficulty / 100);
             this.isSolved = false;
             this.gameFailed = false;
             this.timeCount = 0;
@@ -348,6 +362,15 @@ var MinesweeperApp;
         setGameSize(x, y) {
             this.sizeX = x;
             this.sizeY = y;
+        }
+        resetGame(game) {
+            for (var i = 0; i < this.sizeY; i++) {
+                for (var j = 0; j < this.sizeX; j++) {
+                    if (game[i][j] != this.mineValue) {
+                        game[i][j] = undefined;
+                    }
+                }
+            }
         }
     }
     GameService.$inject = ['$q'];
