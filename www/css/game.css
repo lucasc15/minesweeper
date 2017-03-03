@@ -59,6 +59,7 @@ img .marker-header {
     min-height: 100%;
     padding: 1%;
     margin: 0 auto;
+    margin-bottom: 25px;
     box-sizing: border-box;
     clear: both;
 }
