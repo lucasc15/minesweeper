@@ -87,7 +87,7 @@ img .marker-header {
 }
 
 .marked-mine {
-    background-image: url("/images/FlaggedCell.png");
+    background-image: url("images/FlaggedCell.png");
     background-size: cover;
     /* background-color: yellow; */
 }
@@ -99,13 +99,13 @@ img .marker-header {
 
 .blank {
 	/* background-color: red; */
-    background-image: url("/images/Cell.png");
+    background-image: url("images/Cell.png");
     background-size: cover;
 }
 
 .no-mine {
 	/* background-color: grey; */
-    background-image: url("/images/CellDown.png");
+    background-image: url("images/CellDown.png");
     background-size: cover;
 }
 
