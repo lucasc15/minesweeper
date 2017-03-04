@@ -105,22 +105,23 @@ img .marker-header {
 }
 
 .no-mine {
-	/* background-color: grey; */
-    background-image: url("images/CellDown.png");
-    background-size: cover;
+	background-color: lightgrey;
+    /* background-image: url("images/CellDown.png");
+    background-size: cover; */
 }
 
 .one-mine {
 	background-image: url("data:image/svg+xml;utf8,\
-						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='50px'>\
-						  <text x='15' y='10' fill='blue' font-size='20' text-anchor='middle' alignment-baseline='central'>1</text></svg>");
+						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='100%' width='100%'>\
+						  <text x='50%' y='50%' fill='blue' font-size='20' text-anchor='middle' alignment-baseline='central'>1</text></svg>");
     background-color: lightblue; 
+    background-size: cover;
 }
 
 .two-mine {
 	background-image: url("data:image/svg+xml;utf8,\
-						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
-						  <text x='15' y='10' fill='green' font-size='20' text-anchor='middle' alignment-baseline='central'>\
+						  <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='100%' width='100%'>\
+						  <text x='50%' y='50%' fill='green' font-size='20' text-anchor='middle' alignment-baseline='central'>\
                             2\
                           </text></svg>");
     background-color: lightblue; 
@@ -128,8 +129,8 @@ img .marker-header {
 
 .three-mine {
     background-image: url("data:image/svg+xml;utf8,\
-						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
-						      <text x='15' y='10' fill='yellow' font-size='20' text-anchor='middle' alignment-baseline='central'>\
+						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='100%' width='100%'>\
+						      <text x='50%' y='50%' fill='yellow' font-size='20' text-anchor='middle' alignment-baseline='central'>\
                                 3\
                               </text></svg>");
     background-color: lightblue; 
@@ -137,8 +138,8 @@ img .marker-header {
 
 .four-mine {
     background-image: url("data:image/svg+xml;utf8,\
-						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
-						      <text x='15' y='10' fill='orange' font-size='20' text-anchor='middle' alignment-baseline='central'>\
+						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='100%' width='100%'>\
+						      <text x='50%' y='50%' fill='orange' font-size='20' text-anchor='middle' alignment-baseline='central'>\
                                 4\
                               </text></svg>");
     background-color: lightblue; 
@@ -146,8 +147,8 @@ img .marker-header {
 
 .five-mine {
     background-image: url("data:image/svg+xml;utf8,\
-						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
-						      <text x='15' y='10' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
+						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='100%' width='100%'>\
+						      <text x='50%' y='50%' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
                                 5\
                               </text></svg>");
     background-color: lightblue; 
@@ -155,8 +156,8 @@ img .marker-header {
 
 .six-mine {
     background-image: url("data:image/svg+xml;utf8,\
-						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
-						      <text x='15' y='10' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
+						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='100%' width='100%'>\
+						      <text x='50%' y='50%' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
                                 6\
                               </text></svg>");
     background-color: lightblue; 
@@ -164,8 +165,8 @@ img .marker-header {
 
 .seven-mine {
     background-image: url("data:image/svg+xml;utf8,\
-						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
-						      <text x='15' y='10' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
+						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='100%' width='100%'>\
+						      <text x='50%' y='50%' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
                                 7\
                               </text></svg>");
     background-color: lightblue; 
@@ -173,8 +174,8 @@ img .marker-header {
 
 .eight-mine {
     background-image: url("data:image/svg+xml;utf8,\
-						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'>\
-						      <text x='15' y='10' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
+						      <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='100%' width='100%'>\
+						      <text x='50%' y='50%' fill='red' font-size='20' text-anchor='middle' alignment-baseline='central'>\
                                 8\
                               </text></svg>");
     background-color: lightblue; 
