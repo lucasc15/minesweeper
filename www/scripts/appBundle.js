@@ -267,7 +267,7 @@ var MinesweeperApp;
         markMine(x, y, game) {
             // Return number used to update the number of mines marked versus total mines
             // return: amount to increment mineDisplayAmount
-            if (game[y][x] != -2 && game[y][x] === undefined) {
+            if (game[y][x] != this.markedValue && game[y][x] != this.markedMineValue && game[y][x] === undefined) {
                 // Allow unselected squares to be marked only
                 game[y][x] = this.markedValue;
                 return -1;
@@ -276,6 +276,9 @@ var MinesweeperApp;
                 // case to unmark squares
                 game[y][x] = undefined;
                 return 1;
+            }
+            else if (game[y][x] == this.markedMineValue) {
+                game[y][x] = this.mineValue;
             }
             else if (game[y][x] == this.mineValue) {
                 game[y][x] = this.markedMineValue;
