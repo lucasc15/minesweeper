@@ -71,7 +71,7 @@ module MinesweeperApp {
                 // Allow unselected squares to be marked only
                 game[y][x] = this.markedValue;
                 return -1;
-            } else if (game[y][x] == this.markedValue) {
+            } else if (game[y][x] == this.markedValue || game[y][x] == this.markedMineValue) {
                 // case to unmark squares
                 game[y][x] = undefined;
                 return 1;
